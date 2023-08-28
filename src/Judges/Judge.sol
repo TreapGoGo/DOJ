@@ -2,32 +2,34 @@
 
 pragma solidity ^0.8.18;
 
-abstract contract JudgeResult {}
+interface ISolution {}
+
+contract JudgeResult {
+    enum JudgeState {
+        NON_EXISTENT,
+        ACCEPTED,
+        WRONG_ANSWER,
+        GAS_LIMIT_EXCEEDED,
+        RUNTIME_ERROR
+    }
+    JudgeState public judgeState;
+    uint256 public gasUsed;
+    string public otherInformation;
+}
 
 abstract contract Judge {
-    // Errors
-
-    error Judge__ReceivedUnexpectedEther();
+    // Type declarations
 
     // Constructor, receive and fallback functions
 
     constructor() {}
 
-    receive() external payable {
-        if (msg.value > 0) {
-            revert Judge__ReceivedUnexpectedEther();
-        }
-    }
-
-    fallback() external payable {
-        if (msg.value > 0) {
-            revert Judge__ReceivedUnexpectedEther();
-        }
-    }
-
-    // External functions
-
     function enterJudge(
         address solutionAddress
-    ) external virtual returns (JudgeResult);
+    ) external returns (JudgeResult) {
+        ISolution solution = ISolution(solutionAddress);
+        return judge(solution);
+    }
+
+    function judge(ISolution solution) internal virtual returns (JudgeResult) {}
 }
