@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Judge, JudgeResult} from "../Judges/Judge.sol";
+import {Judge} from "../Judges/Judge.sol";
 
 abstract contract Problem {
     // Errors
@@ -20,20 +20,22 @@ abstract contract Problem {
         address submitterAddress;
         address solutionAddress;
         uint256 timestamp;
-        JudgeResult judgeResult;
+        Judge.JudgeResult judgeResult;
     }
 
     // State variables
 
     address[] public s_authorizedEditorList;
 
+    Judge public s_bondJudge;
+
     ProblemType public s_problemType;
     string public s_title;
     string public s_contentUri;
     uint256 public s_gasLimit;
-    Submission[] public s_submissions;
 
-    Judge public s_bondJudge;
+    Submission[] public s_submissionList;
+    uint256 public s_bestSubmissionId;
 
     // Modifiers
 
@@ -60,7 +62,20 @@ abstract contract Problem {
 
     // Events
 
-    event newSubmission(address submitterAddress, address solutionAddress);
+    event newSubmission(
+        address submitterAddress,
+        address solutionAddress,
+        uint256 timestamp,
+        Judge.JudgeState judgeState,
+        uint256 gasUsed,
+        string otherInformation
+    );
+
+    event newRecordCreated(
+        uint256 submissionId,
+        address submitterAddress,
+        address solutionAddress
+    );
 
     // Constructor, receive and fallback functions
 
@@ -75,12 +90,46 @@ abstract contract Problem {
         s_title = title_;
         s_contentUri = contentUri_;
         s_gasLimit = gasLimit_;
-        s_submissions = new Submission[](0);
     }
 
     // External functions
 
-    function submitSolution(address solutionAddress) external {}
+    function submitSolution(
+        address solutionAddress
+    ) external onlyIfJudgeHasBeenBond {
+        Judge.JudgeResult memory judgeResult = s_bondJudge.enterJudge(
+            solutionAddress
+        );
+        s_submissionList.push(
+            Submission(
+                msg.sender,
+                solutionAddress,
+                block.timestamp,
+                judgeResult
+            )
+        );
+        emit newSubmission(
+            msg.sender,
+            solutionAddress,
+            block.timestamp,
+            judgeResult.judgeState,
+            judgeResult.gasUsed,
+            judgeResult.otherInformation
+        );
+
+        if (
+            judgeResult.judgeState == Judge.JudgeState.ACCEPTED &&
+            judgeResult.gasUsed <
+            getSubmissionByIndex(s_bestSubmissionId).judgeResult.gasUsed
+        ) {
+            s_bestSubmissionId = s_submissionList.length - 1;
+            emit newRecordCreated(
+                s_submissionList.length - 1,
+                msg.sender,
+                solutionAddress
+            );
+        }
+    }
 
     function bindJudge(address judgeAddress) external onlyIfAuthorized {
         s_bondJudge = Judge(judgeAddress);
@@ -107,13 +156,13 @@ abstract contract Problem {
     }
 
     function getSubmissionNumbers() public view returns (uint256) {
-        return s_submissions.length;
+        return s_submissionList.length;
     }
 
-    function getSubmission(
+    function getSubmissionByIndex(
         uint256 index
     ) public view returns (Submission memory) {
-        return s_submissions[index];
+        return s_submissionList[index];
     }
 
     function getBondJudgeAddress() public view returns (address) {

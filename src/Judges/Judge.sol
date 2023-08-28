@@ -2,9 +2,13 @@
 
 pragma solidity ^0.8.18;
 
-interface ISolution {}
+interface SolutionInterface {}
 
-contract JudgeResult {
+abstract contract Judge {
+    // Type declarations
+
+    SolutionInterface internal solutionInterface;
+
     enum JudgeState {
         NON_EXISTENT,
         ACCEPTED,
@@ -12,24 +16,31 @@ contract JudgeResult {
         GAS_LIMIT_EXCEEDED,
         RUNTIME_ERROR
     }
-    JudgeState public judgeState;
-    uint256 public gasUsed;
-    string public otherInformation;
-}
 
-abstract contract Judge {
-    // Type declarations
+    struct JudgeResult {
+        JudgeState judgeState;
+        uint256 gasUsed;
+        string otherInformation;
+    }
 
     // Constructor, receive and fallback functions
 
-    constructor() {}
+    constructor(SolutionInterface implementedSolutionInterface) {
+        solutionInterface = implementedSolutionInterface;
+    }
+
+    // External functions
 
     function enterJudge(
         address solutionAddress
-    ) external returns (JudgeResult) {
-        ISolution solution = ISolution(solutionAddress);
+    ) external returns (JudgeResult memory) {
+        SolutionInterface solution = SolutionInterface(solutionAddress);
         return judge(solution);
     }
 
-    function judge(ISolution solution) internal virtual returns (JudgeResult) {}
+    // Internal functions
+
+    function judge(
+        SolutionInterface solution
+    ) internal virtual returns (JudgeResult memory);
 }
