@@ -17,6 +17,7 @@ abstract contract Problem {
 
     string public _title;
     string public _contentUri;
+    uint256 public _gasLimit;
     Submission[] public _submissions;
 
     // Constructor, receive and fallback functions
@@ -37,7 +38,7 @@ abstract contract Problem {
 
     // External functions
 
-    function submitSolution(address solutionAddress) external {}
+    function submitSolution(address solutionAddress) external virtual;
 
     // Getter functions
 
@@ -47,6 +48,10 @@ abstract contract Problem {
 
     function getContentUri() public view returns (string memory) {
         return _contentUri;
+    }
+
+    function getGasLimit() public view returns (uint256) {
+        return _gasLimit;
     }
 
     function getSubmissionNumbers() public view returns (uint256) {
