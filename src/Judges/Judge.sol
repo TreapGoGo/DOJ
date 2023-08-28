@@ -23,10 +23,14 @@ abstract contract Judge {
         string otherInformation;
     }
 
+    // State variables
+
+    bytes32 private fakeRandomSeed;
+
     // Constructor, receive and fallback functions
 
-    constructor(SolutionInterface implementedSolutionInterface) {
-        solutionInterface = implementedSolutionInterface;
+    constructor(SolutionInterface implementedSolutionInterface_) {
+        solutionInterface = implementedSolutionInterface_;
     }
 
     // External functions
@@ -35,6 +39,16 @@ abstract contract Judge {
         address solutionAddress
     ) external returns (JudgeResult memory) {
         SolutionInterface solution = SolutionInterface(solutionAddress);
+        fakeRandomSeed = keccak256(
+            abi.encodePacked(
+                fakeRandomSeed,
+                msg.sender,
+                solutionAddress,
+                block.timestamp,
+                block.prevrandao,
+                block.number
+            )
+        );
         return judge(solution);
     }
 
@@ -43,4 +57,20 @@ abstract contract Judge {
     function judge(
         SolutionInterface solution
     ) internal virtual returns (JudgeResult memory);
+
+    function getFakeRandomUnsignedInteger() internal returns (uint256) {
+        uint256 fakeRandomNumber = uint256(
+            keccak256(abi.encodePacked(fakeRandomSeed))
+        );
+        fakeRandomSeed = keccak256(
+            abi.encodePacked(fakeRandomSeed, fakeRandomNumber)
+        );
+        return fakeRandomNumber;
+    }
+
+    function getFakeRandomUnsignedInteger(
+        uint256 max
+    ) internal returns (uint256) {
+        return getFakeRandomUnsignedInteger() % max;
+    }
 }
