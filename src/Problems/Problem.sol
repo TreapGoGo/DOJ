@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {Judge} from "../Judges/Judge.sol";
 
-abstract contract Problem {
+contract Problem {
     // Errors
     error Problem__UnauthorizedAction();
     error Problem__JudgeNotBond();
