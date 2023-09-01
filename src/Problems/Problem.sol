@@ -63,28 +63,21 @@ abstract contract Problem {
     // Events
 
     event newSubmission(
-        address submitterAddress,
-        address solutionAddress,
-        uint256 timestamp,
+        address indexed submitterAddress,
+        address indexed solutionAddress,
+        uint256 indexed timestamp,
         Judge.JudgeState judgeState,
         uint256 gasUsed,
         string otherInformation
     );
 
     event newRecordCreated(
-        uint256 submissionId,
-        address submitterAddress,
-        address solutionAddress
+        uint256 indexed submissionId, address indexed submitterAddress, address indexed solutionAddress
     );
 
     // Constructor, receive and fallback functions
 
-    constructor(
-        ProblemType problemType_,
-        string memory title_,
-        string memory contentUri_,
-        uint256 gasLimit_
-    ) {
+    constructor(ProblemType problemType_, string memory title_, string memory contentUri_, uint256 gasLimit_) {
         s_problemType = problemType_;
         s_authorizedEditorList.push(msg.sender);
         s_title = title_;
@@ -94,20 +87,9 @@ abstract contract Problem {
 
     // External functions
 
-    function submitSolution(
-        address solutionAddress
-    ) external onlyIfJudgeHasBeenBond {
-        Judge.JudgeResult memory judgeResult = s_bondJudge.enterJudge(
-            solutionAddress
-        );
-        s_submissionList.push(
-            Submission(
-                msg.sender,
-                solutionAddress,
-                block.timestamp,
-                judgeResult
-            )
-        );
+    function submitSolution(address solutionAddress) external onlyIfJudgeHasBeenBond {
+        Judge.JudgeResult memory judgeResult = s_bondJudge.enterJudge(solutionAddress);
+        s_submissionList.push(Submission(msg.sender, solutionAddress, block.timestamp, judgeResult));
         emit newSubmission(
             msg.sender,
             solutionAddress,
@@ -118,16 +100,11 @@ abstract contract Problem {
         );
 
         if (
-            judgeResult.judgeState == Judge.JudgeState.ACCEPTED &&
-            judgeResult.gasUsed <
-            getSubmissionByIndex(s_bestSubmissionId).judgeResult.gasUsed
+            judgeResult.judgeState == Judge.JudgeState.ACCEPTED
+                && judgeResult.gasUsed < getSubmissionByIndex(s_bestSubmissionId).judgeResult.gasUsed
         ) {
             s_bestSubmissionId = s_submissionList.length - 1;
-            emit newRecordCreated(
-                s_submissionList.length - 1,
-                msg.sender,
-                solutionAddress
-            );
+            emit newRecordCreated(s_submissionList.length - 1, msg.sender, solutionAddress);
         }
     }
 
@@ -135,9 +112,7 @@ abstract contract Problem {
         s_bondJudge = Judge(judgeAddress);
     }
 
-    function addAuthorizedEditor(
-        address editorAddress
-    ) external onlyIfAuthorized {
+    function addAuthorizedEditor(address editorAddress) external onlyIfAuthorized {
         s_authorizedEditorList.push(editorAddress);
     }
 
@@ -159,9 +134,7 @@ abstract contract Problem {
         return s_submissionList.length;
     }
 
-    function getSubmissionByIndex(
-        uint256 index
-    ) public view returns (Submission memory) {
+    function getSubmissionByIndex(uint256 index) public view returns (Submission memory) {
         return s_submissionList[index];
     }
 

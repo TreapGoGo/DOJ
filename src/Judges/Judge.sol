@@ -35,18 +35,11 @@ abstract contract Judge {
 
     // External functions
 
-    function enterJudge(
-        address solutionAddress
-    ) external returns (JudgeResult memory) {
+    function enterJudge(address solutionAddress) external returns (JudgeResult memory) {
         SolutionInterface solution = SolutionInterface(solutionAddress);
         fakeRandomSeed = keccak256(
             abi.encodePacked(
-                fakeRandomSeed,
-                msg.sender,
-                solutionAddress,
-                block.timestamp,
-                block.prevrandao,
-                block.number
+                fakeRandomSeed, msg.sender, solutionAddress, block.timestamp, block.prevrandao, block.number
             )
         );
         return judge(solution);
@@ -54,23 +47,15 @@ abstract contract Judge {
 
     // Internal functions
 
-    function judge(
-        SolutionInterface solution
-    ) internal virtual returns (JudgeResult memory);
+    function judge(SolutionInterface solution) internal virtual returns (JudgeResult memory);
 
     function getFakeRandomUnsignedInteger() internal returns (uint256) {
-        uint256 fakeRandomNumber = uint256(
-            keccak256(abi.encodePacked(fakeRandomSeed))
-        );
-        fakeRandomSeed = keccak256(
-            abi.encodePacked(fakeRandomSeed, fakeRandomNumber)
-        );
+        uint256 fakeRandomNumber = uint256(keccak256(abi.encodePacked(fakeRandomSeed)));
+        fakeRandomSeed = keccak256(abi.encodePacked(fakeRandomSeed, fakeRandomNumber));
         return fakeRandomNumber;
     }
 
-    function getFakeRandomUnsignedInteger(
-        uint256 max
-    ) internal returns (uint256) {
+    function getFakeRandomUnsignedInteger(uint256 max) internal returns (uint256) {
         return getFakeRandomUnsignedInteger() % max;
     }
 }
