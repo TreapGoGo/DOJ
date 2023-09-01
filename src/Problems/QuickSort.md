@@ -1,6 +1,6 @@
 # Description
 
-Gas limit: 1000000 gas
+Gas limit: 10000000 gas 
 
 You're give an `uint256[]` array, whose length is no more than $1000$ . Try to sort it in the increasing manner.
 

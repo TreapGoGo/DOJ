@@ -23,7 +23,7 @@ contract TestQuickSort is Test {
 
     uint256[] public arr;
     uint256[] public expectedArr;
-    uint256 constant MEASURE_LOWER_BOUND = 1;
+    uint256 constant MEASURE_LOWER_BOUND = 3;
     uint256 constant MEASURE_UPPER_BOUND = 1000;
 
     function setUp() public {
@@ -94,7 +94,7 @@ contract TestQuickSort is Test {
         uint256 gas1 = 0;
         uint256 gas2 = 0;
 
-        for (uint256 i = MEASURE_LOWER_BOUND; i <= MEASURE_UPPER_BOUND; i *= 2) {
+        for (uint256 i = MEASURE_LOWER_BOUND; i <= MEASURE_UPPER_BOUND; i = i * 7 / 5) {
             arr = prepare(i);
 
             gas1 = gasleft();
@@ -113,11 +113,12 @@ contract TestQuickSort is Test {
             bubbleGasUsed[i] = gas1 - gas2;
         }
 
-        for (uint256 i = MEASURE_LOWER_BOUND; i <= MEASURE_UPPER_BOUND; i *= 2) {
-            console.log(i);
-            console.log(quickGasUsed[i]);
-            console.log(mergeGasUsed[i]);
-            console.log(bubbleGasUsed[i]);
+        for (uint256 i = MEASURE_LOWER_BOUND; i <= MEASURE_UPPER_BOUND; i = i * 7 / 5) {
+            // console.log(i);
+            // console.log(quickGasUsed[i]);
+            // console.log(mergeGasUsed[i]);
+            // console.log(bubbleGasUsed[i]);
+            console.log(i, quickGasUsed[i], mergeGasUsed[i], bubbleGasUsed[i]);
         }
     }
 }
