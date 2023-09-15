@@ -53,7 +53,7 @@ To provide a solution, you need to:
 
 # Example
 
-For Quick Sort problem, I write three solutions - quick sort, merge sort and bubble sort, whose time complexity is $O(n\log n)$, $O(n\log n)$ and $O(n^2)$ respectively.
+For Quick Sort problem, I write three solutions - quick sort, merge sort and bubble sort, whose time complexities are $O(n\log n)$, $O(n\log n)$ and $O(n^2)$ respectively.
 
 Here comes their gas usage comparison. As the scale of the array growing, their performances become extremely distinct.
 
