@@ -9,6 +9,7 @@ import {QuickSortSolution} from "../src/Solutions/QuickSortSolution.sol";
 import {MergeSortSolution} from "../src/Solutions/MergeSortSolution.sol";
 import {BubbleSortSolution} from "../src/Solutions/BubbleSortSolution.sol";
 import {DeployQuickSortProblem} from "../script/DeployQuickSortProblem.s.sol";
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 
 contract TestQuickSort is Test {
     constructor() {}
@@ -21,6 +22,7 @@ contract TestQuickSort is Test {
 
     DeployQuickSortProblem deployer;
 
+    address public USER = makeAddr("user");
     uint256[] public arr;
     uint256[] public expectedArr;
     uint256 constant MEASURE_LOWER_BOUND = 3;
@@ -125,5 +127,15 @@ contract TestQuickSort is Test {
     ///////////////////////
     // Problem Tests     //
     ///////////////////////
-    function testCanRevertIfJudgeNotBond() public {}
+    function testCanRevertIfJudgeNotBond() public {
+        vm.expectRevert(Problem.Problem__JudgeNotBond.selector);
+        sortProblem.submitSolution(address(mergeSortSolution));
+    }
+
+    function testCanRevertIfNotAuthorized() public {
+        vm.expectRevert(Problem.Problem__UnauthorizedAction.selector);
+        sortProblem.bindJudge(address(judge));
+        vm.expectRevert(Problem.Problem__UnauthorizedAction.selector);
+        sortProblem.addAuthorizedEditor(USER);
+    }
 }
