@@ -121,4 +121,9 @@ contract TestQuickSort is Test {
             console.log(i, quickGasUsed[i], mergeGasUsed[i], bubbleGasUsed[i]);
         }
     }
+
+    ///////////////////////
+    // Problem Tests     //
+    ///////////////////////
+    function testCanRevertIfJudgeNotBond() public {}
 }

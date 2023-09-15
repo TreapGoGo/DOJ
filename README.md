@@ -42,11 +42,25 @@ To create a problem, you need to:
 * write the content of you problem and encode it with `base64` to generate an URI
 * inherit `SolutionInterface` interface, which defines the functions that an solution contract must implement
 * inherit `Judge` contract and override `judge()` function, in which you can test whether a solution is right or wrong
-* write a script to deploy everything
+* write a script to deploy everything, where you can set the `testCaseNumber`, `gasLimit` and other parameters.
 
 To provide a solution, you need to:
 
 * implement the `SolutionInterface` of that problem
 * design and implement an excellent algorithm to solve this problem
-* write a scripte to deploy your solution 
+* write a script to deploy your solution 
 * call `enterJudge` with the address of your solution and get the result of the judge
+
+# Example
+
+For Quick Sort problem, I write three solutions - quick sort, merge sort and bubble sort, whose time complexity is $O(n\log n)$, $O(n\log n)$ and $O(n^2)$ respectively.
+
+Here comes their gas usage comparison. As the scale of the array growing, their performances become extremely distinct.
+
+|            Gas Usage in linear                  |     Gas Usage in logarithm        |
+|:-----------------------------------------------:|:---------------------------------:|
+|![Gas Usage in linear](./img/gasUsedInLinear.png)|![Alt text](./img/gasUsedInLog.png)|
+
+The gas usage of quick sort and merge sort, which are of the same time complexity, grows together slowly, while that of bubble sort pumps up rapidly.
+
+This proves that we can use the time complexity to distinguish which one is a better solution. It also allows some linear spare time to avoid unexpected and unpleasant TLE (GLE in DOJ, which means Gas Limit Exceeded).
