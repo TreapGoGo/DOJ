@@ -55,7 +55,7 @@ To provide a solution, you need to:
 
 For Quick Sort problem, I write three solutions - quick sort, merge sort and bubble sort, whose time complexities are $O(n\log n)$, $O(n\log n)$ and $O(n^2)$ respectively.
 
-Here comes their gas usage comparison. As the scale of the array growing, their performances become extremely distinct.
+Here comes their gas usage comparison. As the scale of the array grows, their performances become extremely distinct.
 
 |            Gas Usage in linear                  |     Gas Usage in logarithm        |
 |:-----------------------------------------------:|:---------------------------------:|
